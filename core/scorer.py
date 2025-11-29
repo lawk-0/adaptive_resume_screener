@@ -1,5 +1,12 @@
 import numpy as np
+import joblib
 from typing import Dict
+
+# Load ML model
+try:
+    ML_MODEL = joblib.load("models/fit_model.pkl")
+except:
+    ML_MODEL = None
 
 
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
@@ -10,10 +17,21 @@ def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
 
 def compute_score(features: Dict) -> float:
     """
-    features: dictionary with keys like "similarity", "skill_match", etc.
-    For now, just scale similarity into 0–100.
+    If ML model exists → use it.
+    Otherwise → fallback to rule-based scoring.
     """
     sim = features.get("similarity", 0.0)
-    # similarity is usually between 0 and 1
-    score = sim * 100
+    skill_count = features.get("skill_count", 0)
+    exp_years = features.get("experience_years", 0.0)
+
+    # If ML model loaded successfully → use ML prediction
+    if ML_MODEL:
+        X = np.array([[sim, skill_count, exp_years]])
+        proba = ML_MODEL.predict_proba(X)[0][1]
+        return round(proba * 100, 2)
+
+    # Fallback logic (if model missing)
+    skill_factor = min(skill_count / 10.0, 1.0)
+    exp_factor = min(exp_years / 5.0, 1.0)
+    score = (0.60 * sim + 0.25 * skill_factor + 0.15 * exp_factor) * 100
     return round(score, 2)
