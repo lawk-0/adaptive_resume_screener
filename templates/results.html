@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h4>Screening Results</h4>
+<p class="text-muted">Job Description length: {{ jd_len }} characters</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Filename</th>
+            <th>Score</th>
+            <th>Similarity</th>
+            <th>Extracted Skills</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in candidates %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ c.filename }}</td>
+            <td>{{ c.score }}</td>
+            <td>{{ "%.3f"|format(c.similarity) }}</td>
+            <td>{{ ", ".join(c.skills) }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('upload') }}" class="btn btn-secondary mt-3">Run Again</a>
+{% endblock %}
