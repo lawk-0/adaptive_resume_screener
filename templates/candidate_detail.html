@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <h4>Candidate Detail</h4>
+        <p class="text-muted">
+            Detailed analysis for <strong>{{ candidate.filename }}</strong>
+        </p>
+        <a href="{{ url_for('upload') }}" class="btn btn-sm btn-outline-secondary me-2">
+            New Screening
+        </a>
+        <a href="{{ url_for('upload') }}" onclick="history.back(); return false;" class="btn btn-sm btn-outline-primary">
+            Back to Results
+        </a>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                Overview
+            </div>
+            <div class="card-body">
+                <p><strong>Filename:</strong> {{ candidate.filename }}</p>
+                <p>
+                    <strong>Suitability Score:</strong>
+                    {% if candidate.score >= 70 %}
+                        <span class="badge bg-success">{{ candidate.score }}</span>
+                    {% elif candidate.score >= 40 %}
+                        <span class="badge bg-warning text-dark">{{ candidate.score }}</span>
+                    {% else %}
+                        <span class="badge bg-danger">{{ candidate.score }}</span>
+                    {% endif %}
+                </p>
+                <p><strong>Similarity:</strong> {{ "%.3f"|format(candidate.similarity) }}</p>
+                <p><strong>Experience (yrs):</strong> {{ candidate.experience_years }}</p>
+                <p><strong>Education:</strong> {{ candidate.education }}</p>
+                <p><strong>Domain:</strong> {{ candidate.domain }}</p>
+                <p><strong>Seniority:</strong> {{ candidate.seniority }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                Skills Analysis
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Skills detected in JD:</strong><br>
+                    {% if jd_skills %}
+                        {{ ", ".join(jd_skills) }}
+                    {% else %}
+                        <span class="text-muted">No JD skills detected</span>
+                    {% endif %}
+                </p>
+                <hr>
+                <p>
+                    <strong>Candidate Skills:</strong><br>
+                    {% if candidate.skills %}
+                        {{ ", ".join(candidate.skills) }}
+                    {% else %}
+                        <span class="text-muted">No skills detected</span>
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Matched Skills:</strong><br>
+                    {% if candidate.matched_skills %}
+                        {{ ", ".join(candidate.matched_skills) }}
+                    {% else %}
+                        <span class="text-muted">None</span>
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Missing Skills (JD expects):</strong><br>
+                    {% if candidate.missing_skills %}
+                        {{ ", ".join(candidate.missing_skills) }}
+                    {% else %}
+                        <span class="text-muted">None</span>
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Extra Skills (not in JD):</strong><br>
+                    {% if candidate.extra_skills %}
+                        {{ ", ".join(candidate.extra_skills) }}
+                    {% else %}
+                        <span class="text-muted">None</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header">
+                Resume Text (Extracted)
+            </div>
+            <div class="card-body" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap;">
+                {% if candidate.raw_text %}
+                    {{ candidate.raw_text }}
+                {% else %}
+                    <span class="text-muted">Raw text not stored for this candidate.</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -7,9 +7,20 @@
         <p class="text-muted mb-1">
             Job Description length: <strong>{{ jd_len }}</strong> characters
         </p>
+
+        {% if jd_skills %}
+        <p class="text-muted">
+            <strong>Skills detected in JD:</strong>
+            {{ ", ".join(jd_skills) }}
+        </p>
+        {% endif %}
+
         <p class="text-muted">
             Candidates are ranked by suitability score, which combines
             <em>semantic similarity</em>, <em>skill matches</em>, and <em>estimated experience</em>.
+            Additional columns show <strong>education</strong>, <strong>domain</strong>,
+            <strong>seniority</strong>, and <strong>skills matched or missing</strong> relative to the job description.
+            Click on a filename to view detailed information for that candidate.
         </p>
     </div>
 
@@ -29,14 +40,23 @@
                             <th scope="col">Score</th>
                             <th scope="col">Similarity</th>
                             <th scope="col">Experience (yrs)</th>
-                            <th scope="col">Extracted Skills</th>
+                            <th scope="col">Education</th>
+                            <th scope="col">Domain</th>
+                            <th scope="col">Seniority</th>
+                            <th scope="col">Matched Skills (JD)</th>
+                            <th scope="col">Missing Skills (JD)</th>
+                            <th scope="col">Extra Skills</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for c in candidates %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>{{ c.filename }}</td>
+                            <td>
+                                <a href="{{ url_for('candidate_detail', idx=loop.index0) }}">
+                                    {{ c.filename }}
+                                </a>
+                            </td>
                             <td>
                                 {% if c.score >= 70 %}
                                     <span class="badge bg-success">{{ c.score }}</span>
@@ -47,18 +67,29 @@
                                 {% endif %}
                             </td>
                             <td>{{ "%.3f"|format(c.similarity) }}</td>
+                            <td>{{ c.experience_years }}</td>
+                            <td>{{ c.education }}</td>
+                            <td>{{ c.domain }}</td>
+                            <td>{{ c.seniority }}</td>
                             <td>
-                                {% if c.experience_years is defined %}
-                                    {{ c.experience_years }}
+                                {% if c.matched_skills %}
+                                    {{ ", ".join(c.matched_skills) }}
                                 {% else %}
-                                    -
+                                    <span class="text-muted">None</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if c.skills %}
-                                    {{ ", ".join(c.skills) }}
+                                {% if c.missing_skills %}
+                                    {{ ", ".join(c.missing_skills) }}
                                 {% else %}
-                                    <span class="text-muted">No skills detected</span>
+                                    <span class="text-muted">None</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if c.extra_skills %}
+                                    {{ ", ".join(c.extra_skills) }}
+                                {% else %}
+                                    <span class="text-muted">None</span>
                                 {% endif %}
                             </td>
                         </tr>

@@ -5,7 +5,7 @@ from typing import Dict
 # Load ML model
 try:
     ML_MODEL = joblib.load("models/fit_model.pkl")
-except:
+except Exception:
     ML_MODEL = None
 
 
@@ -24,13 +24,12 @@ def compute_score(features: Dict) -> float:
     skill_count = features.get("skill_count", 0)
     exp_years = features.get("experience_years", 0.0)
 
-    # If ML model loaded successfully → use ML prediction
     if ML_MODEL:
         X = np.array([[sim, skill_count, exp_years]])
-        proba = ML_MODEL.predict_proba(X)[0][1]
+        proba = ML_MODEL.predict_proba(X)[0][1]  # probability of class 1 (good fit)
         return round(proba * 100, 2)
 
-    # Fallback logic (if model missing)
+    # Fallback logic if model missing
     skill_factor = min(skill_count / 10.0, 1.0)
     exp_factor = min(exp_years / 5.0, 1.0)
     score = (0.60 * sim + 0.25 * skill_factor + 0.15 * exp_factor) * 100
